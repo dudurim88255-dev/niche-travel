@@ -1,26 +1,171 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "leaflet/dist/leaflet.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "Noto Sans KR", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-heading: "Noto Sans KR", ui-sans-serif, system-ui, sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* niche-travel: 카테고리 색상 (Atoms 원본) */
+  --color-cat-mart: var(--cat-mart);
+  --color-cat-book: var(--cat-book);
+  --color-cat-mountain: var(--cat-mountain);
+  --color-cat-skill: var(--cat-skill);
+  --color-cat-quiet: var(--cat-quiet);
+  --color-cat-road: var(--cat-road);
+  --color-cat-sport: var(--cat-sport);
+  --color-cat-beauty: var(--cat-beauty);
+  --color-cat-default: var(--cat-default);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* niche-travel 베이스 토큰 (Atoms export 원본) */
+  --background: #faf7f2;
+  --foreground: #2c2825;
+  --card: #ffffff;
+  --card-foreground: #2c2825;
+  --popover: #ffffff;
+  --popover-foreground: #2c2825;
+  --primary: #ff6b35;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f0e8;
+  --secondary-foreground: #2c2825;
+  --muted: #f5f0e8;
+  --muted-foreground: #8a8478;
+  --accent: #fff1ea;
+  --accent-foreground: #ff6b35;
+  --destructive: #c62828;
+  --border: #e8e3db;
+  --input: #e8e3db;
+  --ring: #ff6b35;
+  --chart-1: #ff6b35;
+  --chart-2: #7c4dff;
+  --chart-3: #2e7d32;
+  --chart-4: #00897b;
+  --chart-5: #5c6bc0;
+  --radius: 0.625rem;
+  --sidebar: #faf7f2;
+  --sidebar-foreground: #2c2825;
+  --sidebar-primary: #ff6b35;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f5f0e8;
+  --sidebar-accent-foreground: #2c2825;
+  --sidebar-border: #e8e3db;
+  --sidebar-ring: #ff6b35;
+
+  /* 카테고리 9색 (마트/책/산/스킬/콰이어트/로드/스포츠/뷰티 + default) */
+  --cat-mart: #ff6b35;
+  --cat-book: #7c4dff;
+  --cat-mountain: #2e7d32;
+  --cat-skill: #00897b;
+  --cat-quiet: #5c6bc0;
+  --cat-road: #e65100;
+  --cat-sport: #c62828;
+  --cat-beauty: #ad1457;
+  --cat-default: #8a8478;
+}
+
+.dark {
+  --background: #1a1816;
+  --foreground: #faf7f2;
+  --card: #25221f;
+  --card-foreground: #faf7f2;
+  --popover: #25221f;
+  --popover-foreground: #faf7f2;
+  --primary: #ff6b35;
+  --primary-foreground: #1a1816;
+  --secondary: #2f2b27;
+  --secondary-foreground: #faf7f2;
+  --muted: #2f2b27;
+  --muted-foreground: #a8a195;
+  --accent: #3a2a23;
+  --accent-foreground: #ff6b35;
+  --destructive: #ef5350;
+  --border: #3a3530;
+  --input: #3a3530;
+  --ring: #ff6b35;
+  --chart-1: #ff6b35;
+  --chart-2: #b39bff;
+  --chart-3: #66bb6a;
+  --chart-4: #4db6ac;
+  --chart-5: #9fa8da;
+  --sidebar: #1a1816;
+  --sidebar-foreground: #faf7f2;
+  --sidebar-primary: #ff6b35;
+  --sidebar-primary-foreground: #1a1816;
+  --sidebar-accent: #2f2b27;
+  --sidebar-accent-foreground: #faf7f2;
+  --sidebar-border: #3a3530;
+  --sidebar-ring: #ff6b35;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* niche-travel: 모바일 컨테이너 (max-width 420px) */
+@utility container-mobile {
+  width: 100%;
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+/* leaflet 마커 등이 Tailwind preflight과 충돌하지 않도록 안전장치 */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-sans);
+  background: var(--muted);
 }

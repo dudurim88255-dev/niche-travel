@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 니치 트래블 (niche-travel)
 
-## Getting Started
+남들이 안 가는 곳, 진짜 일상에 닿는 여행을 큐레이션하는 모바일 우선 웹앱.
 
-First, run the development server:
+## 스택
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Next.js 16** (App Router, Turbopack)
+- **React 19**
+- **TypeScript**
+- **Tailwind CSS v4** (CSS 변수 기반 토큰)
+- **shadcn/ui** (radix 베이스, slate 베이스 컬러)
+- **react-leaflet** (지도)
+- **lucide-react** (아이콘)
+- **date-fns** (날짜)
+- **Noto Sans KR** (Google Fonts)
+
+## 디렉토리 구조
+
+```
+app/                # App Router (layout, page, globals.css)
+components/ui/      # shadcn/ui 컴포넌트 (button, card, dialog, input, sonner, badge)
+lib/utils.ts        # cn() 등 공용 유틸
+public/             # 정적 파일
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 실행 방법
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# 의존성 설치 (이미 되어 있음)
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# 개발 서버
+npm run dev          # http://localhost:3000
 
-## Learn More
+# 프로덕션 빌드
+npm run build
+npm run start
 
-To learn more about Next.js, take a look at the following resources:
+# 린트
+npm run lint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 디자인 시스템
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`DESIGN.md` 참조. 모든 토큰은 `app/globals.css`의 CSS 변수로 정의되어 있고, Tailwind v4 `@theme inline`을 통해 클래스로 노출된다.
 
-## Deploy on Vercel
+- 모바일 컨테이너: `class="container-mobile"` (max-width 420px)
+- 카테고리 색상: `text-cat-mart`, `bg-cat-book` 등 (마트/책/산/스킬/콰이어트/로드/스포츠/뷰티 + default)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 개발 메모
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `toast` 컴포넌트는 shadcn 최신에서 `sonner`로 통합됨 — `import { toast } from "sonner"`로 사용
+- 루트 레이아웃에 `<Toaster />`가 이미 mount되어 있음
+- 다크 모드는 `<html>`에 `class="dark"` 추가로 활성화
+- Next.js 16 변경사항은 `node_modules/next/dist/docs/`에서 확인
