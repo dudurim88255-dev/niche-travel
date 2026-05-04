@@ -49,7 +49,7 @@
   --color-cat-skill: var(--cat-skill);
   --color-cat-quiet: var(--cat-quiet);
   --color-cat-road: var(--cat-road);
-  --color-cat-sport: var(--cat-sport);
+  --color-cat-sports: var(--cat-sports);
   --color-cat-beauty: var(--cat-beauty);
   --color-cat-default: var(--cat-default);
 
@@ -104,7 +104,7 @@
   --cat-skill: #00897b;
   --cat-quiet: #5c6bc0;
   --cat-road: #e65100;
-  --cat-sport: #c62828;
+  --cat-sports: #c62828;
   --cat-beauty: #ad1457;
   --cat-default: #8a8478;
 }
