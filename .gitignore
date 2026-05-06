@@ -29,9 +29,13 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+# 작업 중 생기는 임시 로그 (build.log, install.log, fetch.log 등)
+*.log
 
 # env files (can opt-in for committing if needed)
 .env*
+# 단, 템플릿(.env.example)은 커밋 — 환경변수 키 문서화
+!.env.example
 
 # vercel
 .vercel
