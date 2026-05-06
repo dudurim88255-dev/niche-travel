@@ -56,7 +56,7 @@ export default async function BlogPostPage({
   if (!post) notFound();
 
   return (
-    <div className="px-5 pt-6 pb-24 min-h-[70vh]" style={{ fontFamily: FONT }}>
+    <div className="flex-1 overflow-y-auto px-5 pt-6 pb-24" style={{ fontFamily: FONT }}>
       <Link
         href="/blog"
         className="inline-flex items-center gap-1 text-[12px] mb-3 no-underline"
@@ -75,6 +75,25 @@ export default async function BlogPostPage({
               { behavior: "wrap", properties: { className: "anchor" } },
             ],
           ]}
+          components={{
+            img: ({ src, alt }) => {
+              const url = typeof src === "string" ? src : "";
+              if (!url) return null;
+              const avif = url.replace(/\.jpe?g$/i, ".avif");
+              return (
+                <picture>
+                  <source srcSet={avif} type="image/avif" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt={alt ?? ""}
+                    loading="eager"
+                    fetchPriority="high"
+                  />
+                </picture>
+              );
+            },
+          }}
         >
           {post.content}
         </ReactMarkdown>

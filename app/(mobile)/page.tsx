@@ -4,9 +4,9 @@
 
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { toast } from "sonner";
-import { CATEGORIES, DESTINATIONS } from "@/data/destinations";
+import { CATEGORIES, DESTINATIONS, type Destination } from "@/data/destinations";
 import { CategoryPill } from "@/components/CategoryPill";
 import { DestinationCard } from "@/components/DestinationCard";
 import { LS, readNumberSet, writeNumberSet } from "@/lib/storage";
@@ -52,10 +52,29 @@ export default function ExplorePage() {
     if (hydrated) writeNumberSet(LS.saved, savedIds);
   }, [savedIds, hydrated]);
 
-  const filtered =
-    activeCat === "all"
-      ? DESTINATIONS
-      : DESTINATIONS.filter((d) => d.cat === activeCat);
+  const filtered = useMemo(
+    () =>
+      activeCat === "all"
+        ? DESTINATIONS
+        : DESTINATIONS.filter((d) => d.cat === activeCat),
+    [activeCat]
+  );
+
+  // 인접 카드 이미지 prefetch — currentIndex 변경 시 ±1 미리 로드.
+  // new Image()는 브라우저 캐시에만 적재, 화면 렌더 X.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const neighbors = [
+      filtered[currentIndex - 1],
+      filtered[currentIndex + 1],
+    ].filter((d): d is Destination => Boolean(d));
+    for (const d of neighbors) {
+      const avif = new Image();
+      avif.src = d.img.replace(/\.jpe?g$/i, ".avif");
+      const jpg = new Image();
+      jpg.src = d.img;
+    }
+  }, [currentIndex, filtered]);
 
   useEffect(() => {
     const filteredNow =
@@ -97,9 +116,31 @@ export default function ExplorePage() {
   }, []);
 
 
-  const nextCard = () =>
-    setCurrentIndex((p) => Math.min(p + 1, filtered.length - 1));
-  const prevCard = () => setCurrentIndex((p) => Math.max(p - 1, 0));
+  // 280ms transform transition 중 추가 입력 차단 (빠른 연속 클릭/스와이프 무시)
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const nextCard = () => {
+    if (isTransitioning) return;
+    if (currentIndex >= filtered.length - 1) return;
+    setIsTransitioning(true);
+    setCurrentIndex((p) => p + 1);
+  };
+  const prevCard = () => {
+    if (isTransitioning) return;
+    if (currentIndex <= 0) return;
+    setIsTransitioning(true);
+    setCurrentIndex((p) => p - 1);
+  };
+  // transform transition만 캐치 (DestinationCard 안의 opacity transition은 무시)
+  const handleStackTransitionEnd = (e: React.TransitionEvent) => {
+    if (e.propertyName === "transform") setIsTransitioning(false);
+  };
+
+  // Phase 8 placeholder — 추후 router.push(`/places/${dest.slug}`) 또는 모달
+  const handleCardClick = useCallback((dest: Destination) => {
+    if (process.env.NODE_ENV !== "production") {
+      console.log("[card click]", dest.id, dest.title);
+    }
+  }, []);
 
   const handleTouchStart = (e: React.TouchEvent) =>
     setTouchStart(e.touches[0].clientY);
@@ -109,14 +150,17 @@ export default function ExplorePage() {
     if (Math.abs(diff) > 50) {
       if (diff > 0) nextCard();
       else prevCard();
+    } else if (Math.abs(diff) < 5 && filtered[currentIndex]) {
+      // 5px 이하 = 명확한 탭. 중간 영역(5~50px)은 우발적 드래그로 보고 무시.
+      handleCardClick(filtered[currentIndex]);
     }
     setTouchStart(null);
   };
 
   return (
-    <div>
+    <div className="flex flex-col flex-1 overflow-hidden">
       <div
-        className="sticky top-0 z-10 flex gap-2 overflow-x-auto px-4 py-3"
+        className="flex gap-2 overflow-x-auto px-4 py-3 shrink-0"
         style={{
           background: "rgba(250,247,242,0.95)",
           backdropFilter: "blur(8px)",
@@ -133,29 +177,59 @@ export default function ExplorePage() {
       </div>
 
       <div
-        className="text-center py-2 text-[11px]"
+        className="text-center py-2 text-[11px] shrink-0"
         style={{ color: "#b0a99e" }}
       >
         ↑ 위로 스와이프하여 더 많은 여행지 탐색
       </div>
 
       <div
-        className="flex justify-center px-4 pb-24"
+        className="flex-1 overflow-hidden relative"
+        style={{
+          touchAction: "pan-y",
+          maxHeight: "var(--app-height)",
+        }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         ref={cardRef}
       >
         {filtered.length > 0 ? (
-          <DestinationCard
-            dest={filtered[currentIndex]}
-            index={currentIndex}
-            total={filtered.length}
-            liked={likedIds.has(filtered[currentIndex].id)}
-            saved={savedIds.has(filtered[currentIndex].id)}
-            onLike={toggleLike}
-            onSave={toggleSave}
-            onShare={shareDestination}
-          />
+          // 카테고리가 바뀌면 stack 자체를 새로 마운트 (transition 발동 안 함)
+          <div
+            key={activeCat}
+            onTransitionEnd={handleStackTransitionEnd}
+            style={{
+              height: "100%",
+              transform: `translateY(${-currentIndex * 100}%)`,
+              transition: "transform 280ms cubic-bezier(0.4, 0, 0.2, 1)",
+              willChange: "transform",
+            }}
+          >
+            {filtered.map((d, i) => (
+              <div
+                key={d.id}
+                style={{
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 1rem 96px",
+                }}
+              >
+                <DestinationCard
+                  dest={d}
+                  index={i}
+                  total={filtered.length}
+                  liked={likedIds.has(d.id)}
+                  saved={savedIds.has(d.id)}
+                  onLike={toggleLike}
+                  onSave={toggleSave}
+                  onShare={shareDestination}
+                  onCardClick={handleCardClick}
+                />
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="p-10 text-center" style={{ color: "#8a8478" }}>
             여행지가 없습니다

@@ -21,7 +21,7 @@ export default async function BlogIndexPage() {
   const posts = await getAllPosts();
 
   return (
-    <div className="px-5 pt-8 pb-24 min-h-[70vh]">
+    <div className="flex-1 overflow-y-auto px-5 pt-8 pb-24">
       <h2
         className="text-[22px] font-extrabold mb-1.5"
         style={{ color: "#2d2a26", fontFamily: FONT }}
@@ -36,7 +36,7 @@ export default async function BlogIndexPage() {
       </p>
 
       <ul className="flex flex-col gap-4">
-        {posts.map((post) => (
+        {posts.map((post, i) => (
           <li key={post.slug}>
             <Link
               href={`/blog/${post.slug}`}
@@ -46,13 +46,26 @@ export default async function BlogIndexPage() {
                 boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
               }}
             >
-              <div
-                style={{
-                  width: "100%",
-                  aspectRatio: "16/9",
-                  background: `#1a1a1a url('${post.hero}') center/cover no-repeat`,
-                }}
-              />
+              <picture>
+                <source
+                  srcSet={post.hero.replace(/\.jpe?g$/i, ".avif")}
+                  type="image/avif"
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={post.hero}
+                  alt=""
+                  loading={i === 0 ? "eager" : "lazy"}
+                  fetchPriority={i === 0 ? "high" : "auto"}
+                  style={{
+                    width: "100%",
+                    aspectRatio: "16/9",
+                    objectFit: "cover",
+                    display: "block",
+                    background: "#1a1a1a",
+                  }}
+                />
+              </picture>
               <div style={{ padding: "14px 16px" }}>
                 <h3
                   className="font-bold text-[15px] leading-snug mb-1.5"

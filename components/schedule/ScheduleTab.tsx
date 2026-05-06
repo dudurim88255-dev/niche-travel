@@ -67,7 +67,7 @@ export function ScheduleTab() {
 
   if (!today) {
     return (
-      <div className="px-5 pt-8 pb-24 min-h-[70vh] flex flex-col items-center justify-center gap-3">
+      <div className="flex-1 overflow-y-auto px-5 pt-8 pb-24 flex flex-col items-center justify-center gap-3">
         <span className="text-4xl">📅</span>
         <p
           className="text-[14px] font-semibold"
@@ -80,7 +80,7 @@ export function ScheduleTab() {
   }
 
   return (
-    <div className="px-5 pt-8 pb-24 min-h-[70vh]">
+    <div className="flex-1 overflow-y-auto px-5 pt-8 pb-24">
       {showFullCalendar && (
         <FullCalendarModal
           today={today}

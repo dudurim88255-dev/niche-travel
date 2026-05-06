@@ -15,6 +15,7 @@ export function DestinationCard({
   onLike,
   onSave,
   onShare,
+  onCardClick,
 }: {
   dest: Destination;
   index: number;
@@ -24,6 +25,7 @@ export function DestinationCard({
   onLike: (id: number) => void;
   onSave: (id: number) => void;
   onShare: (dest: Destination) => void;
+  onCardClick?: (dest: Destination) => void;
 }) {
   const catObj = CATEGORIES.find((c) => c.id === dest.cat)!;
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -31,22 +33,32 @@ export function DestinationCard({
   return (
     <div
       className="relative w-full overflow-hidden"
+      onClick={() => onCardClick?.(dest)}
       style={{
         maxWidth: 420,
+        maxHeight: "100%",
         aspectRatio: "9/14",
         borderRadius: 20,
         boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
         background: "#1a1a1a",
+        cursor: onCardClick ? "pointer" : "default",
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={dest.img}
-        alt={dest.title}
-        onLoad={() => setImgLoaded(true)}
-        className="w-full h-full object-cover transition-opacity duration-500"
-        style={{ opacity: imgLoaded ? 1 : 0 }}
-      />
+      <picture className="block w-full h-full">
+        <source
+          srcSet={dest.img.replace(/\.jpe?g$/i, ".avif")}
+          type="image/avif"
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={dest.img}
+          alt={dest.title}
+          onLoad={() => setImgLoaded(true)}
+          loading="lazy"
+          className="w-full h-full object-cover transition-opacity duration-500"
+          style={{ opacity: imgLoaded ? 1 : 0 }}
+        />
+      </picture>
       <div
         className="absolute inset-0"
         style={{
@@ -94,7 +106,10 @@ export function DestinationCard({
         style={{ right: 12, bottom: 180 }}
       >
         <button
-          onClick={() => onLike(dest.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onLike(dest.id);
+          }}
           className="bg-transparent border-none cursor-pointer flex flex-col items-center gap-0.5"
         >
           <span
@@ -111,7 +126,10 @@ export function DestinationCard({
           </span>
         </button>
         <button
-          onClick={() => onSave(dest.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSave(dest.id);
+          }}
           className="bg-transparent border-none cursor-pointer flex flex-col items-center gap-0.5"
         >
           <span className="text-2xl">{saved ? "📌" : "📍"}</span>
@@ -123,7 +141,10 @@ export function DestinationCard({
           </span>
         </button>
         <button
-          onClick={() => onShare(dest)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onShare(dest);
+          }}
           className="bg-transparent border-none cursor-pointer flex flex-col items-center gap-0.5"
         >
           <span className="text-2xl">🔗</span>

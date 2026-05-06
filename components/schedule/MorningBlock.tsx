@@ -101,18 +101,25 @@ export function MorningBlock({ savedIds }: { savedIds: Set<number> }) {
                     boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                   }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={dest.img}
-                    alt=""
-                    className="object-cover"
-                    style={{
-                      width: 52,
-                      height: 52,
-                      borderRadius: 10,
-                      flexShrink: 0,
-                    }}
-                  />
+                  <picture>
+                    <source
+                      srcSet={dest.img.replace(/\.jpe?g$/i, ".avif")}
+                      type="image/avif"
+                    />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={dest.img}
+                      alt=""
+                      className="object-cover"
+                      style={{
+                        width: 52,
+                        height: 52,
+                        borderRadius: 10,
+                        flexShrink: 0,
+                      }}
+                      loading="lazy"
+                    />
+                  </picture>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span

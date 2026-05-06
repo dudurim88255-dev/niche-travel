@@ -70,7 +70,7 @@ export function MapTab() {
   };
 
   return (
-    <div className="px-5 pt-8 pb-24 min-h-[70vh]">
+    <div className="flex-1 overflow-y-auto px-5 pt-8 pb-24">
       <h2
         className="text-[22px] font-extrabold mb-1.5"
         style={{ color: "#2d2a26", fontFamily: FONT }}
@@ -146,13 +146,20 @@ export function MapTab() {
                 transition: "all 0.2s",
               }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={d.img}
-                alt=""
-                className="object-cover"
-                style={{ width: 56, height: 56, borderRadius: 10 }}
-              />
+              <picture>
+                <source
+                  srcSet={d.img.replace(/\.jpe?g$/i, ".avif")}
+                  type="image/avif"
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={d.img}
+                  alt=""
+                  className="object-cover"
+                  style={{ width: 56, height: 56, borderRadius: 10 }}
+                  loading="lazy"
+                />
+              </picture>
               <div className="flex-1">
                 <div
                   className="text-sm font-bold"

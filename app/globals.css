@@ -143,9 +143,33 @@
   --sidebar-ring: #ff6b35;
 }
 
+/* dvh 첫 렌더 버그 회피: 3중 fallback.
+   1) 100vh 폴백, 2) @supports로 dvh 채택, 3) BootstrapClient가 JS로 정확한 px 갱신.
+   --app-height는 :root에 cascade되어 모든 자식이 참조 가능. */
+:root {
+  --vh: 100vh;
+  --app-height: 100vh;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --app-height: 100dvh;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* 한 화면 고정 셸: 페이지 자체 스크롤 차단.
+     세로 스크롤은 각 라우트의 내부 컨테이너(overflow-y: auto)가 담당. */
+  html,
+  body {
+    height: 100%;
+    height: var(--app-height);
+    overflow: hidden;
+    overscroll-behavior: none;
   }
   html {
     @apply font-sans;
@@ -153,6 +177,13 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* MobileFrame이 사용. 클래스로 분리해야 fallback 체인 (% → var → -webkit-fill-available)이 명확. */
+.mobile-frame {
+  height: 100%;
+  height: var(--app-height);
+  min-height: -webkit-fill-available;
 }
 
 /* niche-travel: 모바일 컨테이너 (max-width 420px) */

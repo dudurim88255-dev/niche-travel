@@ -4,9 +4,9 @@
 
 ## 현재 상태
 
-- **HEAD**: `a81f9de` (chore: phase 6 vercel deployment ready) + 6.5 후속 정리(.gitignore .vercel 중복 제거)
+- **HEAD**: Phase 7 (이 커밋) — UX 잠금 + 클릭 분리 + 슬라이드 애니메이션 + 이미지 최적화
 - **마지막 작업일**: 2026-05-06
-- **배포**: ✅ 라이브 — https://niche-travel.vercel.app (Vercel ICN1, 2026-05-06 배포)
+- **배포**: ✅ 라이브 — https://niche-travel.vercel.app (Vercel ICN1, 첫 배포 2026-05-06)
 - **GitHub**: https://github.com/dudurim88255-dev/niche-travel (origin)
 - **Vercel 프로젝트**: `dudurim88255-4558s-projects/niche-travel`
   - projectId: `prj_Me5IcoSqcmwfXyqLPfpVDTFQf8aZ`
@@ -24,7 +24,8 @@
 | 3-A + 4 | `c37495e` | device-id, exportAll/importAll, D-Day 배지, share.ts, PWA(manifest+아이콘+meta) |
 | 5 | `b4df227` | 매거진 5편 SSG, sitemap/robots, BottomNav 매거진 통합 |
 | 6 | `a81f9de` | 배포 설정 (vercel.json, .env.example, README, SESSION_STATE) |
-| 6.5 | (이 커밋) | Vercel CLI 첫 production 배포, .gitignore 정리 |
+| 6.5 | `e979059` | Vercel CLI 첫 production 배포, .gitignore 정리 |
+| 7 | (이 커밋) | viewport 잠금(dvh fallback) + 카드 클릭 분리 + 슬라이드 애니메이션 + 이미지 최적화(81% 감소) |
 
 ## 보류된 Phase
 
@@ -61,7 +62,7 @@
 ### 한계 (의도된 설계)
 - **localStorage 단독 운영**: 시크릿 모드, 다른 브라우저, OS 재설치 시 데이터 분리. Phase 3-B에서 해결.
 - **동행 매칭은 더미 8명 기반**: `data/companions.ts`. 실제 유저 매칭 X (데모 UI).
-- **이미지 사이즈**: 여행지 30장 평균 2MB, 매거진 hero 평균 1.9MB. 모바일 LCP에 영향 가능.
+- **이미지 사이즈** (Phase 7 후): 여행지 30장 JPEG 평균 200KB + AVIF 평균 170KB, 매거진 hero JPEG 평균 200KB + AVIF 평균 155KB. 81% 감소.
 - **PWA 아이콘 임시 디자인**: 흰 "여행" 텍스트 + #FF6B35 배경. 정식 로고 확정 후 교체.
 - **다크 모드 토글 UI 없음**: 토큰은 정의되어 있지만 토글 스위치는 미구현.
 
