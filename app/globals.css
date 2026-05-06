@@ -169,3 +169,90 @@
   font-family: var(--font-sans);
   background: var(--muted);
 }
+
+/* 매거진 본문 prose: 모바일 가독성 우선 (max-w 420 안) */
+.blog-prose {
+  color: #2d2a26;
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 14.5px;
+  line-height: 1.75;
+}
+.blog-prose h1 {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.3;
+  margin: 1.5rem 0 1rem;
+  color: #2d2a26;
+}
+.blog-prose h2 {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 1.75rem 0 0.75rem;
+  color: #2d2a26;
+}
+.blog-prose h3 {
+  font-size: 15.5px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 1.25rem 0 0.5rem;
+  color: #2d2a26;
+}
+.blog-prose p {
+  margin: 0.85rem 0;
+}
+.blog-prose strong {
+  font-weight: 700;
+  color: #2d2a26;
+}
+.blog-prose a {
+  color: #ff6b35;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.blog-prose a:hover {
+  text-decoration: none;
+}
+.blog-prose ul,
+.blog-prose ol {
+  margin: 0.75rem 0;
+  padding-left: 1.25rem;
+}
+.blog-prose ul {
+  list-style: disc;
+}
+.blog-prose ol {
+  list-style: decimal;
+}
+.blog-prose li {
+  margin: 0.35rem 0;
+}
+.blog-prose img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 1rem 0;
+  display: block;
+}
+.blog-prose blockquote {
+  border-left: 3px solid #ff6b35;
+  padding: 0.25rem 0 0.25rem 0.85rem;
+  margin: 1rem 0;
+  color: #5a5346;
+  font-style: italic;
+}
+.blog-prose code {
+  background: #f5f0e8;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: "Geist Mono", ui-monospace, monospace;
+}
+/* rehype-autolink-headings: behavior=wrap → 헤더 내용 전체가 a로 감싸짐 */
+.blog-prose .anchor {
+  color: inherit;
+  text-decoration: none;
+}
+.blog-prose .anchor:hover {
+  text-decoration: none;
+}

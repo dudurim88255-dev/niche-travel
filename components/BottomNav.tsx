@@ -1,6 +1,5 @@
 // 원본 Index.tsx 1906~1957줄 디자인 그대로.
-// Phase 2: setTab 대신 Next Link + usePathname 사용 (라우트 분리).
-// 매거진 탭은 외부 정적 경로(/blog/)이므로 native <a>.
+// Phase 5: 매거진 탭도 Next Link로 통일 (/blog, 같은 탭). usePathname startsWith 매칭.
 
 "use client";
 
@@ -8,13 +7,29 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const TABS = [
-  { href: "/", icon: "🧭", label: "탐색" },
-  { href: "/map", icon: "🗺️", label: "내 지도" },
-  { href: "/schedule", icon: "📅", label: "내 일정" },
+  { href: "/", icon: "🧭", label: "탐색", match: (p: string) => p === "/" },
+  {
+    href: "/map",
+    icon: "🗺️",
+    label: "내 지도",
+    match: (p: string) => p === "/map" || p.startsWith("/map/"),
+  },
+  {
+    href: "/schedule",
+    icon: "📅",
+    label: "내 일정",
+    match: (p: string) => p === "/schedule" || p.startsWith("/schedule/"),
+  },
+  {
+    href: "/blog",
+    icon: "📖",
+    label: "매거진",
+    match: (p: string) => p === "/blog" || p.startsWith("/blog/"),
+  },
 ] as const;
 
 export function BottomNav() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "/";
   return (
     <div
       className="fixed flex justify-around z-30"
@@ -31,7 +46,7 @@ export function BottomNav() {
       }}
     >
       {TABS.map((t) => {
-        const active = pathname === t.href;
+        const active = t.match(pathname);
         return (
           <Link
             key={t.href}
@@ -52,19 +67,6 @@ export function BottomNav() {
           </Link>
         );
       })}
-      <a
-        href="/blog/"
-        className="flex flex-col items-center gap-1 no-underline"
-        style={{
-          color: "#8a8478",
-          fontFamily: "'Noto Sans KR', sans-serif",
-        }}
-      >
-        <span className="text-[22px]">📖</span>
-        <span className="text-[11px]" style={{ fontWeight: 500 }}>
-          매거진
-        </span>
-      </a>
     </div>
   );
 }

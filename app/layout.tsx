@@ -23,6 +23,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://niche-travel.app"
+  ),
   title: "나만의 여행",
   description: "남들이 안 가는 곳, 진짜 일상에 닿는 여행",
   applicationName: "나만의여행",
