@@ -1,24 +1,16 @@
 // 원본 Index.tsx 1730~1900줄 (NicheTravel main + explore tab) 1:1 이식.
 // Phase 2: 라우트 분리에 따라 BottomNav/MobileFrame/탭 분기는 (mobile)/layout.tsx로 이동.
-// localStorage 동기화: lib/storage.ts 헬퍼 사용 (nt:saved, nt:liked).
-// navigator.share + clipboard fallback + sonner toast.
+// Phase 4: 공유 로직은 lib/share.ts로 추출, ?dest=N URL 진입 지원.
 
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import {
-  CATEGORIES,
-  DESTINATIONS,
-  type Destination,
-} from "@/data/destinations";
+import { CATEGORIES, DESTINATIONS } from "@/data/destinations";
 import { CategoryPill } from "@/components/CategoryPill";
 import { DestinationCard } from "@/components/DestinationCard";
-import {
-  LS,
-  readNumberSet,
-  writeNumberSet,
-} from "@/lib/storage";
+import { LS, readNumberSet, writeNumberSet } from "@/lib/storage";
+import { shareDestination } from "@/lib/share";
 
 export default function ExplorePage() {
   const [activeCat, setActiveCat] = useState("all");
@@ -29,10 +21,28 @@ export default function ExplorePage() {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
+  // ?dest=N 진입 시 해당 카드로 자동 이동 (activeCat 변경 → useEffect에서 index 보정)
+  const pendingDestRef = useRef<number | null>(null);
+
   useEffect(() => {
     setLikedIds(readNumberSet(LS.liked));
     setSavedIds(readNumberSet(LS.saved));
     setHydrated(true);
+
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const destParam = params.get("dest");
+      if (destParam) {
+        const id = Number.parseInt(destParam, 10);
+        if (Number.isFinite(id)) {
+          const dest = DESTINATIONS.find((d) => d.id === id);
+          if (dest) {
+            pendingDestRef.current = id;
+            setActiveCat(dest.cat);
+          }
+        }
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -48,7 +58,19 @@ export default function ExplorePage() {
       : DESTINATIONS.filter((d) => d.cat === activeCat);
 
   useEffect(() => {
-    setCurrentIndex(0);
+    const filteredNow =
+      activeCat === "all"
+        ? DESTINATIONS
+        : DESTINATIONS.filter((d) => d.cat === activeCat);
+    if (pendingDestRef.current !== null) {
+      const idx = filteredNow.findIndex(
+        (d) => d.id === pendingDestRef.current
+      );
+      setCurrentIndex(idx >= 0 ? idx : 0);
+      pendingDestRef.current = null;
+    } else {
+      setCurrentIndex(0);
+    }
   }, [activeCat]);
 
   const toggleLike = useCallback((id: number) => {
@@ -74,33 +96,6 @@ export default function ExplorePage() {
     });
   }, []);
 
-  const handleShare = useCallback(async (dest: Destination) => {
-    const shareUrl =
-      typeof window !== "undefined" ? window.location.href : "";
-    const shareData = {
-      title: dest.title,
-      text: `${dest.desc}\n📍 ${dest.location}`,
-      url: shareUrl,
-    };
-    try {
-      if (typeof navigator !== "undefined" && navigator.share) {
-        await navigator.share(shareData);
-        return;
-      }
-    } catch {
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(
-        `${dest.title}\n${dest.desc}\n📍 ${dest.location}\n${shareUrl}`
-      );
-      toast.success("클립보드에 복사했어요", {
-        description: "링크와 설명을 어디든 붙여넣으세요",
-      });
-    } catch {
-      toast.error("공유에 실패했어요");
-    }
-  }, []);
 
   const nextCard = () =>
     setCurrentIndex((p) => Math.min(p + 1, filtered.length - 1));
@@ -159,7 +154,7 @@ export default function ExplorePage() {
             saved={savedIds.has(filtered[currentIndex].id)}
             onLike={toggleLike}
             onSave={toggleSave}
-            onShare={handleShare}
+            onShare={shareDestination}
           />
         ) : (
           <div className="p-10 text-center" style={{ color: "#8a8478" }}>

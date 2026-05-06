@@ -4,6 +4,7 @@
 "use client";
 
 import type { ScheduleMap } from "@/lib/schedule";
+import { DDayBadge } from "@/components/DDayBadge";
 
 const FONT = "'Noto Sans KR', sans-serif";
 
@@ -85,12 +86,15 @@ export function WeekCalendar({
             boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
           }}
         >
-          <span
-            className="text-[11px] font-bold block mb-2"
-            style={{ color: "#FF6B35", fontFamily: FONT }}
-          >
-            📋 {sel.month}/{sel.date} 일정
-          </span>
+          <div className="flex items-center justify-between mb-2">
+            <span
+              className="text-[11px] font-bold"
+              style={{ color: "#FF6B35", fontFamily: FONT }}
+            >
+              📋 {sel.month}/{sel.date} 일정
+            </span>
+            <DDayBadge targetDate={sel.fullDate} />
+          </div>
           <div className="flex flex-col gap-1">
             {selNotes.map((note, idx) => (
               <div

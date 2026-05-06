@@ -4,10 +4,12 @@
 import type { ReactNode } from "react";
 import { MobileFrame } from "@/components/MobileFrame";
 import { BottomNav } from "@/components/BottomNav";
+import { BootstrapClient } from "@/components/BootstrapClient";
 
 export default function MobileLayout({ children }: { children: ReactNode }) {
   return (
     <>
+      <BootstrapClient />
       <MobileFrame>{children}</MobileFrame>
       <BottomNav />
     </>
