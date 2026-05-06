@@ -4,9 +4,15 @@
 
 ## 현재 상태
 
-- **HEAD**: `b4df227` (feat: phase 5 magazine + seo)
+- **HEAD**: `a81f9de` (chore: phase 6 vercel deployment ready) + 6.5 후속 정리(.gitignore .vercel 중복 제거)
 - **마지막 작업일**: 2026-05-06
-- **상태**: Phase 6 배포 준비 단계 — Vercel 배포는 사용자가 직접 트리거 예정
+- **배포**: ✅ 라이브 — https://niche-travel.vercel.app (Vercel ICN1, 2026-05-06 배포)
+- **GitHub**: https://github.com/dudurim88255-dev/niche-travel (origin)
+- **Vercel 프로젝트**: `dudurim88255-4558s-projects/niche-travel`
+  - projectId: `prj_Me5IcoSqcmwfXyqLPfpVDTFQf8aZ`
+  - orgId: `team_ruRodWfalxM5k4QldqQgNq7d`
+  - 첫 배포 ID: `dpl_DGfX4hXqKfbjF25EyhBEgz5yCrQf` (빌드 55s)
+  - GitHub 자동 배포 연결됨 — 이후 main 푸시 시 자동 배포
 
 ## 완료된 Phase
 
@@ -17,7 +23,8 @@
 | 2 | `67ff66a` | 라우트 분리, /map (Leaflet), /schedule (7컴포넌트), 동행 찾기 |
 | 3-A + 4 | `c37495e` | device-id, exportAll/importAll, D-Day 배지, share.ts, PWA(manifest+아이콘+meta) |
 | 5 | `b4df227` | 매거진 5편 SSG, sitemap/robots, BottomNav 매거진 통합 |
-| 6 | (이 커밋) | 배포 설정 (vercel.json, .env.example, README, SESSION_STATE) |
+| 6 | `a81f9de` | 배포 설정 (vercel.json, .env.example, README, SESSION_STATE) |
+| 6.5 | (이 커밋) | Vercel CLI 첫 production 배포, .gitignore 정리 |
 
 ## 보류된 Phase
 
@@ -70,18 +77,28 @@
 ### 검증 통과 사항 (증거 있음)
 - 빌드 성공: 10 라우트 + manifest/sitemap/robots prerender, 5편 SSG (`.next/server/app/blog/*.html`)
 - TypeScript 통과
-- 모든 라우트 dev 서버 200 OK
-- /sitemap.xml 9 url 노드, /robots.txt User-Agent + Sitemap
+- **Vercel 프로덕션 라이브 검증** (2026-05-06): /, /map, /schedule, /blog, /blog/{slug}, /sitemap.xml, /robots.txt, /manifest.webmanifest, /icons/icon-192.png, /destinations/1.jpg 모두 200 + 올바른 Content-Type
+- /sitemap.xml 9 url 노드 (실제 도메인 `niche-travel.vercel.app`로 렌더), /robots.txt User-Agent + Sitemap
 - /manifest.webmanifest application/manifest+json (한글 name 포함)
 - 메타 태그 SSR 노출: theme-color/manifest/apple-touch-icon/apple-mobile-web-app-capable
 
 ## 다음 세션 시작 시 먼저 확인할 것
 
-1. **`git log --oneline -5`** — HEAD가 `b4df227` 이후인지, 푸시되었는지
-2. **`git remote -v`** — origin 추가됐는지
-3. **Vercel 배포 URL** — 사용자가 알려주면 README/.env.example/SESSION_STATE 일괄 갱신
+1. **`git log --oneline -5`** — HEAD 변동, 푸시 여부
+2. **`vercel ls niche-travel`** — 최근 배포 상태, 마지막 배포 시각
+3. **`https://niche-travel.vercel.app/` 접속** — 라이브 정상인지 빠르게 점검
 4. **`npm run build`** — 새 의존성 추가 후라면 재빌드해서 회귀 없는지 확인
 5. **사용자가 보고한 시각 차이** — 모바일/데스크탑 실측 결과 있다면 우선 처리 (디자인 변경 금지 원칙)
+6. **Lighthouse 점수** — 사용자가 측정 결과 공유하면 우선 작업 (LCP 개선 = 이미지 최적화)
+
+## Vercel 운영 메모
+
+- **배포 트리거**: GitHub `main` 푸시 시 자동 (Vercel 대시보드에서 설정됨)
+- **수동 재배포**: `vercel --prod`
+- **환경변수 변경**: `vercel env rm KEY ENV --yes` → `printf "value" | vercel env add KEY ENV` (PowerShell stdin pipe는 BOM 오염 주의 — Bash printf 사용)
+- **Preview 환경변수**: 첫 등록 시 `--git-branch` 명시 필요 (CLI v53). 현재 production/development만 등록됨
+- **로그 확인**: `vercel inspect <deployment-url>` 또는 대시보드 inspector
+- **롤백**: 대시보드에서 이전 배포 promote
 
 ## 운영 절차 메모
 
