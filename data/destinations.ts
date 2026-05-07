@@ -47,6 +47,7 @@ export const CATEGORIES: Category[] = [
   { id: "all", label: "전체", emoji: "🌍", color: "#FF6B35" },
   { id: "mart", label: "마트 어택", emoji: "🛒", color: "#FF6B35" },
   { id: "book", label: "책 스케이프", emoji: "📚", color: "#7C4DFF" },
+  { id: "mountain", label: "산악 바이브", emoji: "🏔️", color: "#2E7D32" },
   { id: "skill", label: "스킬 시커", emoji: "🎓", color: "#00897B" },
   { id: "quiet", label: "콰이어트케이션", emoji: "🧘", color: "#5C6BC0" },
   { id: "road", label: "로드트립", emoji: "🚗", color: "#E65100" },
@@ -278,7 +279,7 @@ export const DESTINATIONS: Destination[] = [
   },
   {
     id: 10,
-    cat: "skill",
+    cat: "mountain",
     title: "돌로미티 트레 치메 산악 트레킹",
     desc: "유네스코 자연유산 돌로미티의 상징, 트레 치메 디 라바레도 3봉 일주 트레일.",
     location: "이탈리아, 돌로미티",
@@ -302,7 +303,7 @@ export const DESTINATIONS: Destination[] = [
   },
   {
     id: 11,
-    cat: "skill",
+    cat: "mountain",
     title: "파타고니아 토레스 델 파이네 W트레킹",
     desc: "칠레 파타고니아의 상징 W 코스 5일 트레킹. 빙하·호수·산봉우리의 절경 연속.",
     location: "칠레, 파타고니아",
@@ -326,7 +327,7 @@ export const DESTINATIONS: Destination[] = [
   },
   {
     id: 12,
-    cat: "skill",
+    cat: "mountain",
     title: "그레이트 스모키 마운틴 NP 트레킹",
     desc: "1934년 설립된 미국 가장 인기 국립공원. 850마일 트레일과 검은 곰의 서식지.",
     location: "미국, 테네시·노스캐롤라이나",
@@ -353,7 +354,7 @@ export const DESTINATIONS: Destination[] = [
   },
   {
     id: 13,
-    cat: "skill",
+    cat: "mountain",
     title: "안나푸르나 베이스캠프 트레킹",
     desc: "히말라야 ABC(4,130m) 7~12일 클래식 트레킹. 2023년부터 외국인 가이드 의무.",
     location: "네팔, 안나푸르나",
