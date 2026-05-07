@@ -5,6 +5,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CATEGORIES, DESTINATIONS, type Destination } from "@/data/destinations";
 import { CategoryPill } from "@/components/CategoryPill";
@@ -135,12 +136,14 @@ export default function ExplorePage() {
     if (e.propertyName === "transform") setIsTransitioning(false);
   };
 
-  // Phase 8 placeholder — 추후 router.push(`/places/${dest.slug}`) 또는 모달
-  const handleCardClick = useCallback((dest: Destination) => {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[card click]", dest.id, dest.title);
-    }
-  }, []);
+  // Phase 8: 카드 탭 → /places/{slug} 상세 페이지로 이동
+  const router = useRouter();
+  const handleCardClick = useCallback(
+    (dest: Destination) => {
+      router.push(`/places/${dest.slug}`);
+    },
+    [router]
+  );
 
   const handleTouchStart = (e: React.TouchEvent) =>
     setTouchStart(e.touches[0].clientY);

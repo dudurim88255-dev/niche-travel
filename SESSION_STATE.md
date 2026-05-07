@@ -4,7 +4,7 @@
 
 ## 현재 상태
 
-- **HEAD**: Phase 7 (이 커밋) — UX 잠금 + 클릭 분리 + 슬라이드 애니메이션 + 이미지 최적화
+- **HEAD**: Phase 8 (이 커밋) — /places/[slug] 30개 SSG + 30 verified destinations + slug 라우팅
 - **마지막 작업일**: 2026-05-06
 - **배포**: ✅ 라이브 — https://niche-travel.vercel.app (Vercel ICN1, 첫 배포 2026-05-06)
 - **GitHub**: https://github.com/dudurim88255-dev/niche-travel (origin)
@@ -25,7 +25,8 @@
 | 5 | `b4df227` | 매거진 5편 SSG, sitemap/robots, BottomNav 매거진 통합 |
 | 6 | `a81f9de` | 배포 설정 (vercel.json, .env.example, README, SESSION_STATE) |
 | 6.5 | `e979059` | Vercel CLI 첫 production 배포, .gitignore 정리 |
-| 7 | (이 커밋) | viewport 잠금(dvh fallback) + 카드 클릭 분리 + 슬라이드 애니메이션 + 이미지 최적화(81% 감소) |
+| 7 | `e454a83` | viewport 잠금(dvh fallback) + 카드 클릭 분리 + 슬라이드 애니메이션 + 이미지 최적화(81% 감소) |
+| 8 | (이 커밋) | /places/[slug] 30개 SSG, Destination 인터페이스 확장(slug+longDesc+tips+sources+disclaimer), 30개 검증 데이터 (verifiedDate 2026-05-07), GLOBAL_DISCLAIMER, 카드 탭→router.push, sitemap 39 URL |
 
 ## 보류된 Phase
 
@@ -60,6 +61,7 @@
 ## 알려진 한계 / 미검증 가정
 
 ### 한계 (의도된 설계)
+- **카테고리 변경 (Phase 8)**: 사용자 새 데이터에 `mountain` 항목 없음 → CATEGORIES에서 mountain 제거(8개 → 7개 + 전체). globals.css의 `--cat-mountain` 토큰은 잔존(향후 복귀 대비). companions.ts의 "산악 바이브" 라벨 매칭은 fallback 색(#8a8478)으로 안전 처리.
 - **localStorage 단독 운영**: 시크릿 모드, 다른 브라우저, OS 재설치 시 데이터 분리. Phase 3-B에서 해결.
 - **동행 매칭은 더미 8명 기반**: `data/companions.ts`. 실제 유저 매칭 X (데모 UI).
 - **이미지 사이즈** (Phase 7 후): 여행지 30장 JPEG 평균 200KB + AVIF 평균 170KB, 매거진 hero JPEG 평균 200KB + AVIF 평균 155KB. 81% 감소.
