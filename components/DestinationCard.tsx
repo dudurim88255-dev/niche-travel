@@ -1,5 +1,6 @@
 // 원본 Index.tsx 149~321줄 (Card 컴포넌트) 1:1 이식.
-// 디자인 변경 금지 — 모든 인라인 스타일/클래스 그대로 유지.
+// Phase 10: 카드 우측 액션 버튼이 이미지 콘텐츠(가격표 등)를 가리는 문제 해결 위해
+// 액션 바를 ActionRail로 분리하고 카드는 콘텐츠 전용. priority prop으로 첫 카드 LCP 최적화.
 
 "use client";
 
@@ -10,21 +11,13 @@ export function DestinationCard({
   dest,
   index,
   total,
-  liked,
-  saved,
-  onLike,
-  onSave,
-  onShare,
+  priority = false,
   onCardClick,
 }: {
   dest: Destination;
   index: number;
   total: number;
-  liked: boolean;
-  saved: boolean;
-  onLike: (id: number) => void;
-  onSave: (id: number) => void;
-  onShare: (dest: Destination) => void;
+  priority?: boolean;
   onCardClick?: (dest: Destination) => void;
 }) {
   const catObj = CATEGORIES.find((c) => c.id === dest.cat)!;
@@ -54,7 +47,9 @@ export function DestinationCard({
           src={dest.img}
           alt={dest.title}
           onLoad={() => setImgLoaded(true)}
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "auto"}
+          decoding={priority ? "sync" : "async"}
           className="w-full h-full object-cover transition-opacity duration-500"
           style={{ opacity: imgLoaded ? 1 : 0 }}
         />
@@ -100,61 +95,6 @@ export function DestinationCard({
         }}
       >
         {index + 1} / {total}
-      </div>
-      <div
-        className="absolute flex flex-col gap-4 items-center"
-        style={{ right: 12, bottom: 180 }}
-      >
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onLike(dest.id);
-          }}
-          className="bg-transparent border-none cursor-pointer flex flex-col items-center gap-0.5"
-        >
-          <span
-            className="text-[26px]"
-            style={{ filter: liked ? "none" : "grayscale(1) brightness(2)" }}
-          >
-            {liked ? "❤️" : "🤍"}
-          </span>
-          <span
-            className="text-white text-[11px]"
-            style={{ fontFamily: "'Noto Sans KR', sans-serif" }}
-          >
-            좋아요
-          </span>
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onSave(dest.id);
-          }}
-          className="bg-transparent border-none cursor-pointer flex flex-col items-center gap-0.5"
-        >
-          <span className="text-2xl">{saved ? "📌" : "📍"}</span>
-          <span
-            className="text-white text-[11px]"
-            style={{ fontFamily: "'Noto Sans KR', sans-serif" }}
-          >
-            저장
-          </span>
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onShare(dest);
-          }}
-          className="bg-transparent border-none cursor-pointer flex flex-col items-center gap-0.5"
-        >
-          <span className="text-2xl">🔗</span>
-          <span
-            className="text-white text-[11px]"
-            style={{ fontFamily: "'Noto Sans KR', sans-serif" }}
-          >
-            공유
-          </span>
-        </button>
       </div>
       <div className="absolute bottom-0 left-0 right-0 px-4 pb-6">
         <h2

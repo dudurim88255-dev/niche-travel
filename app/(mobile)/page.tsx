@@ -1,6 +1,8 @@
 // 원본 Index.tsx 1730~1900줄 (NicheTravel main + explore tab) 1:1 이식.
 // Phase 2: 라우트 분리에 따라 BottomNav/MobileFrame/탭 분기는 (mobile)/layout.tsx로 이동.
 // Phase 4: 공유 로직은 lib/share.ts로 추출, ?dest=N URL 진입 지원.
+// Phase 10: 카드 우측 콘텐츠를 가리던 액션 버튼을 카드 외부 ActionRail로 분리.
+//   첫 카드 priority + 점진 렌더(3개 → 전체)로 LCP 단축.
 
 "use client";
 
@@ -10,6 +12,7 @@ import { toast } from "sonner";
 import { CATEGORIES, DESTINATIONS, type Destination } from "@/data/destinations";
 import { CategoryPill } from "@/components/CategoryPill";
 import { DestinationCard } from "@/components/DestinationCard";
+import { ActionRail } from "@/components/ActionRail";
 import { LS, readNumberSet, writeNumberSet } from "@/lib/storage";
 import { shareDestination } from "@/lib/share";
 
@@ -25,11 +28,15 @@ export default function ExplorePage() {
   // ?dest=N 진입 시 해당 카드로 자동 이동 (activeCat 변경 → useEffect에서 index 보정)
   const pendingDestRef = useRef<number | null>(null);
 
+  // 점진 렌더: 첫 페인트 후 100ms 지나면 전체 렌더. dest deep-link면 즉시 전체.
+  const [progressiveReady, setProgressiveReady] = useState(false);
+
   useEffect(() => {
     setLikedIds(readNumberSet(LS.liked));
     setSavedIds(readNumberSet(LS.saved));
     setHydrated(true);
 
+    let hasDestParam = false;
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const destParam = params.get("dest");
@@ -40,9 +47,17 @@ export default function ExplorePage() {
           if (dest) {
             pendingDestRef.current = id;
             setActiveCat(dest.cat);
+            hasDestParam = true;
           }
         }
       }
+    }
+
+    if (hasDestParam) {
+      setProgressiveReady(true);
+    } else {
+      const timer = setTimeout(() => setProgressiveReady(true), 100);
+      return () => clearTimeout(timer);
     }
   }, []);
 
@@ -160,6 +175,13 @@ export default function ExplorePage() {
     setTouchStart(null);
   };
 
+  // 점진 렌더: deep-link 진입 시 currentIndex가 0이 아닐 수 있으므로 최소한 그만큼은 렌더.
+  const renderCount = progressiveReady
+    ? filtered.length
+    : Math.max(3, currentIndex + 2);
+
+  const currentDest = filtered[currentIndex];
+
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       <div
@@ -197,41 +219,59 @@ export default function ExplorePage() {
         ref={cardRef}
       >
         {filtered.length > 0 ? (
-          // 카테고리가 바뀌면 stack 자체를 새로 마운트 (transition 발동 안 함)
-          <div
-            key={activeCat}
-            onTransitionEnd={handleStackTransitionEnd}
-            style={{
-              height: "100%",
-              transform: `translateY(${-currentIndex * 100}%)`,
-              transition: "transform 280ms cubic-bezier(0.4, 0, 0.2, 1)",
-              willChange: "transform",
-            }}
-          >
-            {filtered.map((d, i) => (
+          <div className="absolute inset-0 flex items-stretch">
+            {/* 카드 스택: flex-1, 우측은 ActionRail */}
+            <div className="flex-1 min-w-0 overflow-hidden">
+              {/* 카테고리가 바뀌면 stack 자체를 새로 마운트 (transition 발동 안 함) */}
               <div
-                key={d.id}
+                key={activeCat}
+                onTransitionEnd={handleStackTransitionEnd}
                 style={{
                   height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "0 1rem 96px",
+                  transform: `translateY(${-currentIndex * 100}%)`,
+                  transition: "transform 280ms cubic-bezier(0.4, 0, 0.2, 1)",
+                  willChange: "transform",
                 }}
               >
-                <DestinationCard
-                  dest={d}
-                  index={i}
-                  total={filtered.length}
-                  liked={likedIds.has(d.id)}
-                  saved={savedIds.has(d.id)}
+                {filtered.slice(0, renderCount).map((d, i) => (
+                  <div
+                    key={d.id}
+                    style={{
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "0 0.5rem 96px 1rem",
+                    }}
+                  >
+                    <DestinationCard
+                      dest={d}
+                      index={i}
+                      total={filtered.length}
+                      priority={i === 0}
+                      onCardClick={handleCardClick}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ActionRail: 현재 카드 기준 단 1개. 카드 스택 외부 우측 고정. */}
+            {currentDest && (
+              <div
+                className="flex items-center shrink-0"
+                style={{ paddingRight: 8, paddingBottom: 96 }}
+              >
+                <ActionRail
+                  dest={currentDest}
+                  liked={likedIds.has(currentDest.id)}
+                  saved={savedIds.has(currentDest.id)}
                   onLike={toggleLike}
                   onSave={toggleSave}
                   onShare={shareDestination}
-                  onCardClick={handleCardClick}
                 />
               </div>
-            ))}
+            )}
           </div>
         ) : (
           <div className="p-10 text-center" style={{ color: "#8a8478" }}>
