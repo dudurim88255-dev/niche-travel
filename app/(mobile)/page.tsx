@@ -1,7 +1,7 @@
 // 원본 Index.tsx 1730~1900줄 (NicheTravel main + explore tab) 1:1 이식.
 // Phase 2: 라우트 분리에 따라 BottomNav/MobileFrame/탭 분기는 (mobile)/layout.tsx로 이동.
 // Phase 4: 공유 로직은 lib/share.ts로 추출, ?dest=N URL 진입 지원.
-// Phase 10: 카드 우측 콘텐츠를 가리던 액션 버튼을 카드 외부 ActionRail로 분리.
+// Phase 10-fix: ActionRail 외부 분리 제거. 카드 좌우 padding 16/16 대칭.
 //   첫 카드 priority + 점진 렌더(3개 → 전체)로 LCP 단축.
 
 "use client";
@@ -12,7 +12,6 @@ import { toast } from "sonner";
 import { CATEGORIES, DESTINATIONS, type Destination } from "@/data/destinations";
 import { CategoryPill } from "@/components/CategoryPill";
 import { DestinationCard } from "@/components/DestinationCard";
-import { ActionRail } from "@/components/ActionRail";
 import { LS, readNumberSet, writeNumberSet } from "@/lib/storage";
 import { shareDestination } from "@/lib/share";
 
@@ -180,8 +179,6 @@ export default function ExplorePage() {
     ? filtered.length
     : Math.max(3, currentIndex + 2);
 
-  const currentDest = filtered[currentIndex];
-
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       <div
@@ -219,59 +216,42 @@ export default function ExplorePage() {
         ref={cardRef}
       >
         {filtered.length > 0 ? (
-          <div className="absolute inset-0 flex items-stretch">
-            {/* 카드 스택: flex-1, 우측은 ActionRail */}
-            <div className="flex-1 min-w-0 overflow-hidden">
-              {/* 카테고리가 바뀌면 stack 자체를 새로 마운트 (transition 발동 안 함) */}
+          // 카테고리가 바뀌면 stack 자체를 새로 마운트 (transition 발동 안 함)
+          <div
+            key={activeCat}
+            onTransitionEnd={handleStackTransitionEnd}
+            style={{
+              height: "100%",
+              transform: `translateY(${-currentIndex * 100}%)`,
+              transition: "transform 280ms cubic-bezier(0.4, 0, 0.2, 1)",
+              willChange: "transform",
+            }}
+          >
+            {filtered.slice(0, renderCount).map((d, i) => (
               <div
-                key={activeCat}
-                onTransitionEnd={handleStackTransitionEnd}
+                key={d.id}
                 style={{
                   height: "100%",
-                  transform: `translateY(${-currentIndex * 100}%)`,
-                  transition: "transform 280ms cubic-bezier(0.4, 0, 0.2, 1)",
-                  willChange: "transform",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 1rem 96px",
                 }}
               >
-                {filtered.slice(0, renderCount).map((d, i) => (
-                  <div
-                    key={d.id}
-                    style={{
-                      height: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      padding: "0 0.5rem 96px 1rem",
-                    }}
-                  >
-                    <DestinationCard
-                      dest={d}
-                      index={i}
-                      total={filtered.length}
-                      priority={i === 0}
-                      onCardClick={handleCardClick}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* ActionRail: 현재 카드 기준 단 1개. 카드 스택 외부 우측 고정. */}
-            {currentDest && (
-              <div
-                className="flex items-center shrink-0"
-                style={{ paddingRight: 8, paddingBottom: 96 }}
-              >
-                <ActionRail
-                  dest={currentDest}
-                  liked={likedIds.has(currentDest.id)}
-                  saved={savedIds.has(currentDest.id)}
+                <DestinationCard
+                  dest={d}
+                  index={i}
+                  total={filtered.length}
+                  liked={likedIds.has(d.id)}
+                  saved={savedIds.has(d.id)}
+                  priority={i === 0}
                   onLike={toggleLike}
                   onSave={toggleSave}
                   onShare={shareDestination}
+                  onCardClick={handleCardClick}
                 />
               </div>
-            )}
+            ))}
           </div>
         ) : (
           <div className="p-10 text-center" style={{ color: "#8a8478" }}>
